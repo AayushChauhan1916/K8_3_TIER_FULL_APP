@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root-app
+  name: bootstrap
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_REPO/k8s.git
+    repoURL: git@github.com:AayushChauhan1916/K8_3_TIER_FULL_APP.git
     targetRevision: HEAD
-    path: argocd
-
+    path: clusters
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-
   syncPolicy:
     automated:
       prune: true

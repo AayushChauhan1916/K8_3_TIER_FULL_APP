@@ -1,10 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: platform
+  name: learning_three_teir
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: '-3'
+spec:
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: global_infra
+  namespace: argocd
 spec:
   sourceRepos:
     - '*'
