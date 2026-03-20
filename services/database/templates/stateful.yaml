@@ -30,29 +30,6 @@ spec:
           volumeMounts:
             - name: mongo-data
               mountPath: /data/db
-
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/sh
-                  - -c
-                  - |
-                    sleep 10
-
-                    if hostname | grep -q "{{ include "db.name" . }}-0"; then
-                      mongosh <<EOF
-                      rs.initiate({
-                        _id: "rs0",
-                        members: [
-                          { _id: 0, host: "{{ include "db.name" . }}-0.{{ include "db.serviceName" . }}:{{ include "db.port" . }}" },
-                          { _id: 1, host: "{{ include "db.name" . }}-1.{{ include "db.serviceName" . }}:{{ include "db.port" . }}" },
-                          { _id: 2, host: "{{ include "db.name" . }}-2.{{ include "db.serviceName" . }}:{{ include "db.port" . }}" }
-                        ]
-                      })
-                      EOF
-                    fi
-
   volumeClaimTemplates:
     - metadata:
         name: mongo-data

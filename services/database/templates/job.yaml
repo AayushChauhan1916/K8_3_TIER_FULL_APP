@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "db.name" . }}-rs-init
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+
+      containers:
+        - name: mongo-init
+          image: mongo:7
+          command:
+            - /bin/sh
+            - -c
+            - |
+              PRIMARY="{{ include "db.name" . }}-0.{{ include "db.serviceName" . }}:{{ include "db.port" . }}"
+
+              echo "Waiting for primary..."
+
+              until mongosh --host $PRIMARY --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+                sleep 3
+              done
+
+              echo "Ensuring replica set initialized..."
+
+              mongosh --host $PRIMARY --eval '
+                try {
+                  rs.status()
+                } catch (e) {
+                  rs.initiate({
+                    _id: "rs0",
+                    members: [
+                      { _id: 0, host: "'"{{ include "db.name" . }}"'-0.'"{{ include "db.serviceName" . }}"':{{ include "db.port" . }}" }
+                    ]
+                  })
+                }
+              '
+
+              echo "Adding remaining members..."
+
+              for i in $(seq 1 {{ sub .Values.replicaCount 1 }}); do
+                HOST="{{ include "db.name" . }}-$i.{{ include "db.serviceName" . }}:{{ include "db.port" . }}"
+
+                echo "Trying to add $HOST"
+
+                mongosh --host $PRIMARY --eval "
+                  try {
+                    rs.add('$HOST')
+                  } catch (e) {
+                    print(e)
+                  }
+                "
+              done
+
+              echo "Replica set configured."
