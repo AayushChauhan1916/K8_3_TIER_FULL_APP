@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '-1'
 spec:
-  project: learning_three_teir
+  project: learning-three-teir
   source:
     repoURL: git@github.com:AayushChauhan1916/K8_3_TIER_FULL_APP.git
     targetRevision: HEAD

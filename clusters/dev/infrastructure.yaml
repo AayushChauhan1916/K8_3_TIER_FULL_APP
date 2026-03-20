@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: '-2'
 spec:
-  project: global_infra
+  project: global-infra
   source:
     repoURL: git@github.com:AayushChauhan1916/K8_3_TIER_FULL_APP.git
     targetRevision: main

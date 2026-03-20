@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: learning_three_teir
+  name: learning-three-teir
   namespace: argocd
 spec:
   sourceRepos:
@@ -17,7 +17,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: global_infra
+  name: global-infra
   namespace: argocd
 spec:
   sourceRepos:
