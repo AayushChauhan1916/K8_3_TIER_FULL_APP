@@ -1,6 +1,6 @@
 global:
   name: nivashub-backend
-  environment: production
+  environment: dev
 
 replicaCount: 2
 
@@ -17,15 +17,15 @@ containerPort: 3000
 
 resources:
   limits:
-    cpu: "500m"
-    memory: "512Mi"
+    cpu: '500m'
+    memory: '512Mi'
   requests:
-    cpu: "200m"
-    memory: "256Mi"
+    cpu: '200m'
+    memory: '256Mi'
 
 env:
   - name: NODE_ENV
-    value: production
+    value: dev
 
 autoscaling:
   enabled: true
