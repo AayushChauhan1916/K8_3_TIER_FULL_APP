@@ -5,7 +5,7 @@ global:
 replicaCount: 2
 
 image:
-  repository: dokcer.io/ishan420/nest-backend
+  repository: docker.io/ishan420/nest-backend
   tag: latest
   pullPolicy: Always
 
