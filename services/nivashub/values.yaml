@@ -25,7 +25,37 @@ resources:
 
 env:
   - name: NODE_ENV
-    value: dev
+    value: 'development'
+
+  - name: PORT
+    value: '3000'
+
+  - name: MONGO_URI
+    value: 'mongodb://mongo-cluster-dev-0.mongo-cluster-dev-svc.database.svc.cluster.local:27017,mongo-cluster-dev-1.mongo-cluster-dev-svc.database.svc.cluster.local:27017,mongo-cluster-dev-2.mongo-cluster-dev-svc.database.svc.cluster.local:27017/Nivas_Hub?replicaSet=rs0'
+
+  - name: JWT_SECRET
+    value: 'your_super_secret_key_here'
+
+  - name: JWT_EXPIRES_IN
+    value: '3000'
+
+  - name: JWT_REFRESH_SECRET
+    value: 'your_super_refresh_secret_key_here'
+
+  - name: JWT_REFRESH_EXPIRES_IN
+    value: '18000'
+
+  - name: GOOGLE_AUTH_CLIENT_ID
+    value: '850598628220-6b9h2p8t44at1t2n8monna4v96g4i5k7.apps.googleusercontent.com'
+
+  - name: GOOGLE_AUTH_CLIENT_SECRET
+    value: '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'
+
+  - name: GOOGLE_AUTH_REDIRECT_URL
+    value: 'http://localhost:5173/auth/google/callback'
+
+  - name: FRONTEND_URL
+    value: 'http://localhost:5173'
 
 autoscaling:
   enabled: true
