@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:AayushChauhan1916/K8_3_TIER_FULL_APP.git
+    repoURL: https://github.com/AayushChauhan1916/K8_3_TIER_FULL_APP.git
     targetRevision: HEAD
     path: clusters
     directory:
