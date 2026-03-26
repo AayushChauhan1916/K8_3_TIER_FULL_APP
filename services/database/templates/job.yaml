@@ -4,8 +4,7 @@ metadata:
   name: {{ include "db.name" . }}-rs-init
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
 spec:
   backoffLimit: 10
   template:
