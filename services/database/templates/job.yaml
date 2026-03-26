@@ -4,7 +4,8 @@ metadata:
   name: {{ include "db.name" . }}-rs-init
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   backoffLimit: 10
   template:
@@ -18,7 +19,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              set -e
+              set -ex
 
               PRIMARY="{{ include "db.name" . }}-0.{{ include "db.serviceName" . }}:{{ include "db.port" . }}"
 
@@ -29,17 +30,11 @@ spec:
 
                 echo "⏳ Waiting for $HOST..."
 
-                until mongosh --host $HOST --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+                until mongosh --host $HOST --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
                   sleep 3
                 done
 
                 echo "✅ $HOST is ready"
-              done
-
-              echo "⏳ Waiting for primary availability..."
-
-              until mongosh --host $PRIMARY --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
-                sleep 2
               done
 
               echo "🔍 Checking if replica set already initialized..."
@@ -55,7 +50,7 @@ spec:
               if [ "$INIT_STATUS" != "1" ]; then
                 echo "⚙️ Initializing replica set..."
 
-                mongosh --host $PRIMARY --eval "
+                mongosh --host $PRIMARY --quiet --eval "
                   rs.initiate({
                     _id: 'rs0',
                     members: [
@@ -64,7 +59,7 @@ spec:
                   })
                 "
 
-                echo "⏳ Waiting for primary to stabilize..."
+                echo "⏳ Waiting for primary election..."
                 sleep 5
               else
                 echo "✅ Replica set already initialized"
@@ -78,14 +73,22 @@ spec:
                 echo "🔍 Checking $HOST..."
 
                 EXISTS=$(mongosh --host $PRIMARY --quiet --eval "
-                  rs.status().members.some(m => m.name === '$HOST')
+                  try {
+                    rs.status().members.some(m => m.name === '$HOST')
+                  } catch (e) {
+                    false
+                  }
                 ")
 
                 if [ "$EXISTS" != "true" ]; then
                   echo "➕ Adding $HOST"
 
-                  mongosh --host $PRIMARY --eval "
-                    rs.add('$HOST')
+                  mongosh --host $PRIMARY --quiet --eval "
+                    try {
+                      rs.add('$HOST')
+                    } catch (e) {
+                      print(e)
+                    }
                   "
 
                   sleep 2
@@ -97,7 +100,13 @@ spec:
               echo "⏳ Waiting for replica set to become healthy..."
 
               until mongosh --host $PRIMARY --quiet --eval "
-                rs.status().members.filter(m => m.stateStr === 'SECONDARY' || m.stateStr === 'PRIMARY').length >= {{ .Values.replicaCount }}
+                try {
+                  rs.status().members.filter(
+                    m => m.stateStr === 'PRIMARY' || m.stateStr === 'SECONDARY'
+                  ).length >= {{ .Values.replicaCount }}
+                } catch (e) {
+                  false
+                }
               " | grep true; do
                 sleep 3
               done
