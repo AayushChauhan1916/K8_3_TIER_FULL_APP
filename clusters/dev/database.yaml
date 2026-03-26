@@ -9,7 +9,7 @@ spec:
   project: learning-three-teir
   source:
     repoURL: git@github.com:AayushChauhan1916/K8_3_TIER_FULL_APP.git
-    targetRevision: HEAD
+    targetRevision: main
     path: services/database
     helm:
       valueFiles:
