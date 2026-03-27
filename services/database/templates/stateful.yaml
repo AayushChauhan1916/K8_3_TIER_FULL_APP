@@ -24,9 +24,6 @@ spec:
             - "--replSet"
             - "rs0"
             - "--bind_ip_all"
-            - "--auth"
-            - "--keyFile"
-            - "/etc/mongo-keyfile/keyfile"
 
           ports:
             - containerPort: {{ include "db.port" . }}
