@@ -18,11 +18,15 @@ spec:
       containers:
         - name: mongo
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+
           command:
             - mongod
             - "--replSet"
             - "rs0"
             - "--bind_ip_all"
+            - "--auth"
+            - "--keyFile"
+            - "/etc/mongo-keyfile/keyfile"
 
           ports:
             - containerPort: {{ include "db.port" . }}
@@ -30,6 +34,17 @@ spec:
           volumeMounts:
             - name: mongo-data
               mountPath: /data/db
+
+            - name: keyfile
+              mountPath: /etc/mongo-keyfile
+              readOnly: true
+
+      volumes:
+        - name: keyfile
+          secret:
+            secretName: mongo-keyfile
+            defaultMode: 0400
+
   volumeClaimTemplates:
     - metadata:
         name: mongo-data

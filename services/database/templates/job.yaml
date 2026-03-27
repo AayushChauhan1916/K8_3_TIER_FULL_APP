@@ -2,11 +2,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "db.name" . }}-rs-init
+  namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+
 spec:
   backoffLimit: 10
+
   template:
     spec:
       restartPolicy: OnFailure
@@ -14,18 +17,24 @@ spec:
       containers:
         - name: mongo-init
           image: mongo:7
+
           command:
             - /bin/sh
             - -c
             - |
               set -ex
 
-              PRIMARY="{{ include "db.name" . }}-0.{{ include "db.serviceName" . }}:{{ include "db.port" . }}"
+              NAMESPACE="{{ .Release.Namespace }}"
+              SERVICE="{{ include "db.serviceName" . }}"
+              NAME="{{ include "db.name" . }}"
+              PORT="{{ include "db.port" . }}"
+
+              PRIMARY="$NAME-0.$SERVICE.$NAMESPACE:$PORT"
 
               echo "🚀 Waiting for ALL Mongo pods..."
 
               for i in $(seq 0 {{ sub .Values.replicaCount 1 }}); do
-                HOST="{{ include "db.name" . }}-$i.{{ include "db.serviceName" . }}:{{ include "db.port" . }}"
+                HOST="$NAME-$i.$SERVICE.$NAMESPACE:$PORT"
 
                 echo "⏳ Waiting for $HOST..."
 
@@ -67,7 +76,7 @@ spec:
               echo "➕ Ensuring all members are added..."
 
               for i in $(seq 1 {{ sub .Values.replicaCount 1 }}); do
-                HOST="{{ include "db.name" . }}-$i.{{ include "db.serviceName" . }}:{{ include "db.port" . }}"
+                HOST="$NAME-$i.$SERVICE.$NAMESPACE:$PORT"
 
                 echo "🔍 Checking $HOST..."
 
