@@ -32,7 +32,7 @@ env:
 
 env:
   - name: MONGO_URI
-    value: "mongodb://mongo-cluster-dev-svc.database:27017/Nivas_Hub?replicaSet=rs0"
+    value: "MONGO_URI=mongodb://nivashub_user:Aayush123@mongo-cluster-dev-0.mongo-cluster-dev-svc.database:27017,mongo-cluster-dev-1.mongo-cluster-dev-svc.database:27017,mongo-cluster-dev-2.mongo-cluster-dev-svc.database:27017/nivashub?replicaSet=rs0&authSource=admin"
 
   - name: JWT_SECRET
     value: 'your_super_secret_key_here'
